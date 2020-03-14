@@ -87,4 +87,3 @@ RUN echo "Installing sdk tools ${ANDROID_SDK_TOOLS_VERSION}" && \
     echo "Installing emulator " && \
     yes | "$ANDROID_HOME"/tools/bin/sdkmanager "emulator" > /dev/null
 RUN mkdir -p $ANDROID_HOME/licenses
-COPY sdk/licenses/* $ANDROID_HOME/licenses/
