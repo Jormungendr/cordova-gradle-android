@@ -1,15 +1,27 @@
-FROM alpine:3.11
+FROM ubuntu:latest
 LABEL authors="fenrisu1fr"
 WORKDIR /tmp
+
+# Init base enviroment
+RUN echo "deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic main restricted universe multiverse" > /etc/apt/sources.list
+RUN echo "deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-updates main restricted universe multiverse" >> /etc/apt/sources.list
+RUN echo "deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-backports main restricted universe multiverse" >> /etc/apt/sources.list
+RUN echo "deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ bionic-security main restricted universe multiverse" >> /etc/apt/sources.list
+
 # Init Cordova & Ionic
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories
-RUN apk update
-RUN apk add nodejs wget npm
+RUN apt update
+RUN apt install npm wget -y
 RUN npm config set registry https://registry.npm.taobao.org
+RUN npm install -g n
+RUN n latest
 RUN npm install -g cordova@8 ionic @angular/cli@8
 
 # Init Java Enviroment
-RUN apk add gradle openjdk8
+RUN apt install gradle -y
+RUN wget https://mirrors.tuna.tsinghua.edu.cn/AdoptOpenJDK/8/jdk/x64/linux/OpenJDK8U-jdk_x64_linux_openj9_8u242b08_openj9-0.18.1.tar.gz
+RUN tar -xvzf OpenJDK8U-jdk_x64_linux_openj9_8u242b08_openj9-0.18.1.tar.gz
+ENV JAVA_HOME /tmp/jdk8u242-b08
+ENV PATH="$PATH:$JAVA_HOME/bin"
 
 # Init Android Enviroment
 ENV ANDROID_HOME="/opt/android-sdk"
@@ -86,4 +98,3 @@ RUN echo "Installing sdk tools ${ANDROID_SDK_TOOLS_VERSION}" && \
         "add-ons;addon-google_apis-google-16" > /dev/null && \
     echo "Installing emulator " && \
     yes | "$ANDROID_HOME"/tools/bin/sdkmanager "emulator" > /dev/null
-RUN mkdir -p $ANDROID_HOME/licenses
